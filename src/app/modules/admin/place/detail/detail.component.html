@@ -1,0 +1,396 @@
+<ng-container *transloco="let t">
+  <div class="flex flex-col flex-auto">
+
+    <div [hidden]="state !== ViewState.LOADING">
+      <mat-progress-bar mode="query"></mat-progress-bar>
+    </div>
+
+    <div class="my-2 mx-4" [hidden]="state !== ViewState.EMPTY">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="'warning'" [@fadeIn]="true" [dismissible]="false">
+        {{ t('NO_DATA_FOUND') }}
+      </fuse-alert>
+    </div>
+
+    <div class="my-2 mx-4" [hidden]="state !== ViewState.ERROR">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="'error'" [@fadeIn]="true" [dismissible]="false">
+        {{ t('ERROR_NETWORK') }}
+      </fuse-alert>
+    </div>
+
+    <div [hidden]="state !== ViewState.CONTENT">
+      <form [ngClass]="{'opacity-50 pointer-events-none': isSavingOrDeleting}"
+        class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto" [formGroup]="form">
+
+        <div class="flex items-center justify-between -mt-3 -ml-4">
+
+          <div class="flex items-center">
+            <button type="button" mat-icon-button [routerLink]="['../']">
+              <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+            </button>
+          </div>
+
+        </div>
+
+        <mat-divider class="mt-6 mb-8"></mat-divider>
+
+        <div class="my-4" *ngIf="isGoogleMapsLoaded">
+
+          <div>
+            <mat-form-field class="w-full">
+              <input class="w-full h-full" matInput (input)="onSearchAddress($event)"
+                [matAutocomplete]="googleAutocomplete" [placeholder]="t('SEARCH_ADDRESS')">
+              <mat-autocomplete class="max-h-128 sm:px-2 border-t rounded-b shadow-md" [disableRipple]="true"
+                #googleAutocomplete="matAutocomplete" [displayWith]="displayGoogleSuggestionWith"
+                (optionSelected)="onGoogleSuggestionSelected($event)">
+                <ng-container *ngFor="let place of googleSuggestions; trackBy: trackByFn">
+                  <mat-option [value]="place"
+                    class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover">
+                    {{ place.description }}
+                  </mat-option>
+                </ng-container>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+
+          <google-map width="100%" height="250px" [options]="mapOptions" (centerChanged)="onMapCenterChanged()">
+            <map-marker></map-marker>
+          </google-map>
+
+          <div class="flex flex-wrap mt-6">
+            <ng-container *ngFor="let image of googlePhotos">
+              <div
+                class="relative flex items-center justify-center w-22 h-22 rounded-md m-2 overflow-hidden ring-4 ring-bg-card">
+
+                <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+                <div class="absolute inset-0 flex items-center justify-center z-20">
+                  <div>
+                    <button type="button" mat-icon-button (click)="onRemoveGooglePhoto(image)">
+                      <mat-icon class="text-white" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <img class="object-cover h-full" [src]="image">
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <div
+            class="relative flex items-center justify-center w-32 h-32 rounded-md overflow-hidden ring-4 ring-bg-card">
+
+            <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+            <div class="absolute inset-0 flex items-center justify-center z-20">
+              <div>
+                <input id="featured-file-input" class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                  type="file" [multiple]="false" [accept]="'image/jpeg, image/png'"
+                  (change)="onUploadFeaturedImage(imageFileInput.files)" #imageFileInput>
+                <label class="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer hover:bg-hover"
+                  for="featured-file-input" matRipple>
+                  <mat-icon class="text-white" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
+                </label>
+              </div>
+              <div>
+                <button type="button" *ngIf="form?.get('image').value" mat-icon-button
+                  (click)="onRemoveFeaturedImage()">
+                  <mat-icon class="text-white" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                </button>
+              </div>
+            </div>
+            <img class="object-cover w-full h-full" *ngIf="form?.get('image').value"
+              [src]="form?.get('image').value._url">
+          </div>
+        </div>
+
+        <div class="mb-8">
+
+          <div class="my-4">
+            <p class="font-medium text-md">{{ t('MAP_MARKER_ICON') }}</p>
+          </div>
+
+          <div
+            class="relative flex items-center justify-center w-18 h-18 rounded-md overflow-hidden ring-4 ring-bg-card">
+
+            <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+            <div class="absolute inset-0 flex items-center justify-center z-20">
+              <div>
+                <input id="icon-file-input" class="absolute h-0 w-0 opacity-0 invisible pointer-events-none" type="file"
+                  [multiple]="false" [accept]="'image/jpeg, image/png'"
+                  (change)="onUploadMapMarkerIcon(mapMarkerIconFileInput.files)" #mapMarkerIconFileInput>
+                <label class="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer hover:bg-hover"
+                  for="icon-file-input" matRipple>
+                  <mat-icon class="text-white" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
+                </label>
+              </div>
+              <div>
+                <button type="button" *ngIf="form?.get('icon').value" mat-icon-button (click)="onRemoveMapMarkerIcon()">
+                  <mat-icon class="text-white" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                </button>
+              </div>
+            </div>
+            <img class="object-cover w-full h-full" *ngIf="form?.get('icon').value"
+              [src]="form?.get('icon').value._url">
+          </div>
+
+          <div class="mt-3">
+            <p class="text-hint">{{ t('MAP_MARKER_ICON_HINT') }}</p>
+          </div>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('TITLE') }}</mat-label>
+            <input matInput [formControlName]="'title'" [spellcheck]="false" #titleField />
+            <mat-error *ngIf="form?.get('title').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('SHORT_DESCRIPTION') }}</mat-label>
+            <textarea matInput matTextareaAutosize [rows]="5" [formControlName]="'description'"></textarea>
+            <mat-error *ngIf="form?.get('description').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('CATEGORIES') }}</mat-label>
+            <mat-chip-list class="py-2" [formControlName]="'categories'" #categoryList>
+              <mat-chip *ngFor="let category of form.get('categories').value" (removed)="onCategoryRemoved(category)">
+                {{ category.title }}
+                <mat-icon class="icon-size-5" matChipRemove [svgIcon]="'heroicons_solid:minus-circle'"></mat-icon>
+              </mat-chip>
+              <input #tagInput (input)="onSearchCategory($event)" [matAutocomplete]="categoryAutocomplete"
+                [placeholder]="t('CATEGORY_PLACEHOLDER')" [matChipInputFor]="categoryList">
+            </mat-chip-list>
+            <mat-autocomplete [displayWith]="displayCategoryWith" #categoryAutocomplete="matAutocomplete"
+              (optionSelected)="onCategorySelected($event)">
+              <mat-option *ngFor="let category of categories" [value]="category">
+                {{ category.title }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('TAGS') }}</mat-label>
+            <mat-chip-list class="py-2" [formControlName]="'tags'" #tagList>
+              <mat-chip *ngFor="let tag of form.get('tags').value" (removed)="onTagRemoved(tag)">
+                {{ tag }}
+                <mat-icon class="icon-size-5" matChipRemove [svgIcon]="'heroicons_solid:minus-circle'"></mat-icon>
+              </mat-chip>
+              <input [placeholder]="t('TAG_PLACEHOLDER')" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                [matChipInputFor]="tagList" (matChipInputTokenEnd)="onAddTag($event)">
+            </mat-chip-list>
+          </mat-form-field>
+        </div>
+
+        <quill-editor class="my-3" [formControlName]="'longDescription'" [placeholder]="''" [modules]="quillModules">
+        </quill-editor>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('OWNER') }}</mat-label>
+            <input class="w-full h-full" matInput (input)="onSearchUser($event)" [formControlName]="'user'"
+              [matAutocomplete]="matAutocomplete" [placeholder]="t('SEARCH')">
+            <mat-autocomplete class="max-h-128 sm:px-2 border-t rounded-b shadow-md" [disableRipple]="true"
+              #matAutocomplete="matAutocomplete" [displayWith]="displayUserWith"
+              (optionSelected)="onUserSelected($event)">
+              <ng-container *ngFor="let user of users; trackBy: trackByFn">
+                <mat-option [value]="user"
+                  class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover">
+                  {{ user.description || t('GUEST') }}
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
+            <mat-error *ngIf="form?.get('user').hasError('mustMatch')">
+              {{ t('FIELD_MATCH_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('ADDRESS') }}</mat-label>
+            <input matInput [formControlName]="'address'" />
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('PHONE') }}</mat-label>
+            <input type="tel" matInput [formControlName]="'phone'" />
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('CONTACT_EMAIL') }}</mat-label>
+            <input type="email" matInput [formControlName]="'email'" />
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('WEBSITE') }}</mat-label>
+            <input type="url" matInput [formControlName]="'website'" />
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>WhatsApp</mat-label>
+            <input type="tel" matInput [formControlName]="'whatsapp'" />
+            <mat-hint class="leading-4">{{ t('WHATS_APP_HINT') }}</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>Facebook</mat-label>
+            <input type="url" matInput [formControlName]="'facebook'" />
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>Instagram</mat-label>
+            <input type="url" matInput [formControlName]="'instagram'" />
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>YouTube</mat-label>
+            <input type="url" matInput [formControlName]="'youtube'" />
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-2/3">
+            <mat-label>{{ t('STATUS') }}</mat-label>
+            <mat-select [formControlName]="'status'">
+              <ng-container *ngFor="let status of statusOpts">
+                <mat-option [value]="status">
+                  {{ t(status.replace(' ', '_') | uppercase) }}
+                </mat-option>
+              </ng-container>
+            </mat-select>
+            <mat-error *ngIf="form?.get('status').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-2/3">
+            <mat-label>{{ t('PRICE_RANGE') }}</mat-label>
+            <mat-select [formControlName]="'priceRange'">
+              <mat-option [value]="null">{{ t('UNSPECIFIED') }}</mat-option>
+              <mat-option [value]="'$'">$</mat-option>
+              <mat-option [value]="'$$'">$$</mat-option>
+              <mat-option [value]="'$$$'">$$$</mat-option>
+              <mat-option [value]="'$$$$'">$$$$</mat-option>
+              <mat-option [value]="'$$$$$'">$$$$$</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-2/3">
+            <mat-label>{{ t('EXPIRATION_DATE') }}</mat-label>
+            <input matInput [formControlName]="'expiresAt'" [matDatepicker]="expiresAtDatePicker">
+            <mat-datepicker-toggle matSuffix [for]="expiresAtDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #expiresAtDatePicker>
+              <mat-datepicker-actions>
+                <button mat-button (click)="form.get('expiresAt').setValue(null)" matDatepickerCancel>
+                  {{ t('CLEAR') }}
+                </button>
+                <button mat-flat-button [color]="'primary'" matDatepickerApply>
+                  {{ t('SELECT') }}
+                </button>
+              </mat-datepicker-actions>
+            </mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-checkbox [color]="'primary'" [formControlName]="'isFeatured'">
+            {{ t('FEATURED') }}
+          </mat-checkbox>
+
+          <div class="mt-3" *ngIf="place?.isFeaturedNonExpired">
+            <p class="text-hint">
+              {{ t('PLACE_FEATURED_EXPIRATION', { date: place?.featuredExpiresAt | translocoDate: { dateStyle: 'medium' } }) }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 mb-2">
+          <p class="font-medium text-xl">{{ t('GALLERY') }}</p>
+        </div>
+
+        <div>
+          <file-pond [options]="pondOptions"></file-pond>
+        </div>
+
+        <div class="flex flex-wrap mt-6" cdkDropListGroup>
+          <div class="flex" (cdkDropListDropped)="onMoveImage($event)" [cdkDropListData]="index"
+            cdkDropListOrientation="horizontal" cdkDropList
+            *ngFor="let image of images; let index = index; trackBy: trackByFn">
+            <div
+              class="relative flex items-center justify-center w-22 h-22 rounded-md m-2 overflow-hidden ring-4 ring-bg-card"
+              cdkDrag>
+              <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+              <div class="absolute inset-0 flex items-center justify-center z-20">
+                <div>
+                  <button type="button" mat-icon-button (click)="onRemoveImage(image)">
+                    <mat-icon class="text-white" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                  </button>
+                </div>
+                <div>
+                  <button type="button" [matTooltip]="t('SET_IMAGE_AS_FEATURED')" mat-icon-button
+                    (click)="onSetImageAsFeatured(image)">
+                    <mat-icon [ngClass]="image._url === form.get('image').value?._url ? 'text-amber-400' : 'text-white'"
+                      [svgIcon]="image._url === form.get('image').value?._url ? 'heroicons_solid:star' : 'heroicons_outline:star'">
+                    </mat-icon>
+                  </button>
+                </div>
+              </div>
+              <img class="object-cover h-full" [src]="image._url">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center mt-4 justify-between w-full border-t py-4">
+          <div *ngIf="mode === ViewMode.UPDATE">
+            <button type="button" class="-ml-4" mat-button [color]="'warn'" [disabled]="isSavingOrDeleting"
+              (click)="onDeleteButtonClicked()">
+              {{ t('DELETE') }}
+            </button>
+          </div>
+          <div class="flex items-center">
+            <button type="submit" mat-flat-button [color]="'primary'" [disabled]="isSavingOrDeleting"
+              (click)="onSaveButtonClicked()">
+              {{ t('SAVE') }}
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="mb-4 px-4" *ngIf="alert.message">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="alert.type" [@fadeIn]="true" [dismissible]="false">
+        {{ alert.message }}
+      </fuse-alert>
+    </div>
+
+  </div>
+</ng-container>

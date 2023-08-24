@@ -1,0 +1,55 @@
+<ng-container *transloco="let t">
+  <div class="w-full max-w-3xl">
+
+    <form [formGroup]="form" [ngClass]="{'opacity-50 pointer-events-none': state === ViewState.LOADING}">
+
+      <div class="w-full">
+        <div class="text-xl">{{ t('CHANGE_PASSWORD') }}</div>
+      </div>
+      <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+        <!-- Current password -->
+        <div class="sm:col-span-4">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('CURRENT_PASSWORD') }}</mat-label>
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:key'" matPrefix></mat-icon>
+            <input [formControlName]="'currentPassword'" type="password" matInput>
+            <mat-error *ngIf="form?.get('currentPassword').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <!-- New password -->
+        <div class="sm:col-span-4">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('NEW_PASSWORD') }}</mat-label>
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:key'" matPrefix></mat-icon>
+            <input [formControlName]="'newPassword'" type="password" matInput>
+            <mat-error *ngIf="form?.get('newPassword').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+            <mat-error *ngIf="form?.get('newPassword').hasError('minlength')">
+              {{ t('PASSWORD_MIN_LENGTH', { val: form?.get('newPassword').errors.minlength.requiredLength }) }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="my-10 border-t"></div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end">
+        <button class="ml-4" mat-flat-button type="submit" [color]="'primary'" (click)="onSaveButtonClicked()">
+          {{ t('SAVE') }}
+        </button>
+      </div>
+    </form>
+
+    <div class="my-4" *ngIf="alert.message">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="alert.type" [@fadeIn]="true" [dismissible]="false">
+        {{ alert.message }}
+      </fuse-alert>
+    </div>
+
+  </div>
+</ng-container>

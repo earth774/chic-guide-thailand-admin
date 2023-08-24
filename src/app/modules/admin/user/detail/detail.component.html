@@ -1,0 +1,181 @@
+<ng-container *transloco="let t">
+  <div class="flex flex-col flex-auto">
+
+    <div [hidden]="state !== ViewState.LOADING">
+      <mat-progress-bar mode="query"></mat-progress-bar>
+    </div>
+
+    <div class="my-2 mx-4" [hidden]="state !== ViewState.EMPTY">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="'warning'" [@fadeIn]="true" [dismissible]="false">
+        {{ t('NO_DATA_FOUND') }}
+      </fuse-alert>
+    </div>
+
+    <div class="my-2 mx-4" [hidden]="state !== ViewState.ERROR">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="'error'" [@fadeIn]="true" [dismissible]="false">
+        {{ t('ERROR_NETWORK') }}
+      </fuse-alert>
+    </div>
+
+    <div [hidden]="state !== ViewState.CONTENT">
+      <form [ngClass]="{'opacity-50 pointer-events-none': isSavingOrDeleting}"
+        class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto" [formGroup]="form">
+
+        <div class="flex items-center justify-between -mt-3 -ml-4">
+
+          <div class="flex items-center">
+            <button type="button" mat-icon-button [routerLink]="['../']">
+              <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+            </button>
+          </div>
+
+        </div>
+
+        <mat-divider class="mt-6 mb-8"></mat-divider>
+
+        <div class="mb-8">
+          <div class="relative flex items-center justify-center w-32 h-32 rounded-md overflow-hidden ring-4 ring-bg-card">
+
+            <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+            <div class="absolute inset-0 flex items-center justify-center z-20">
+              <div>
+                <input id="avatar-file-input" class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                  type="file" [multiple]="false" [accept]="'image/jpeg, image/png'"
+                  (change)="onUploadImage(imageFileInput.files)" #imageFileInput>
+                <label class="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer hover:bg-hover"
+                  for="avatar-file-input" matRipple>
+                  <mat-icon class="text-white" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
+                </label>
+              </div>
+              <div>
+                <button type="button" *ngIf="form?.get('photo').value" mat-icon-button
+                  (click)="onRemoveImage()">
+                  <mat-icon class="text-white" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                </button>
+              </div>
+            </div>
+            <img class="object-cover w-full h-full" *ngIf="form?.get('photo').value"
+              [src]="form?.get('photo').value._url">
+          </div>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('NAME') }}</mat-label>
+            <input matInput [formControlName]="'name'" #nameField />
+            <mat-error *ngIf="form?.get('name').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('USERNAME') }}</mat-label>
+            <input matInput [formControlName]="'username'" />
+            <mat-error *ngIf="form?.get('username').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('EMAIL_ADDRESS') }}</mat-label>
+            <input type="email" matInput [formControlName]="'email'" />
+            <mat-error *ngIf="form?.get('email').hasError('email')">
+              {{ t('EMAIL_ADDRESS_INVALID') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('PASSWORD') }}</mat-label>
+            <input type="password" matInput [formControlName]="'password'" />
+            <mat-hint *ngIf="mode === ViewMode.UPDATE">
+              {{ t('FIELD_LEAVE_UNCHANGED') }}
+            </mat-hint>
+            <mat-error *ngIf="form?.get('password').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+            <mat-error *ngIf="form?.get('password').hasError('minlength')">
+              {{ t('PASSWORD_MIN_LENGTH', { val: form?.get('password').errors.minlength.requiredLength }) }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="moduleUrl === 'users'">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('PERMISSIONS') }}</mat-label>
+            <mat-select [multiple]="true" [formControlName]="'permissions'">
+              <mat-option [value]="'places'">
+                {{ t('PLACES') }}
+              </mat-option>
+              <mat-option [value]="'categories'">
+                {{ t('CATEGORIES') }}
+              </mat-option>
+              <mat-option [value]="'customers'">
+                {{ t('CUSTOMERS') }}
+              </mat-option>
+              <mat-option [value]="'users'">
+                {{ t('USERS') }}
+              </mat-option>
+              <mat-option [value]="'reviews'">
+                {{ t('REVIEWS') }}
+              </mat-option>
+              <mat-option [value]="'slide_images'">
+                {{ t('SLIDE_IMAGES') }}
+              </mat-option>
+              <mat-option [value]="'slides'">
+                {{ t('SLIDES') }}
+              </mat-option>
+              <mat-option [value]="'notifications'">
+                {{ t('NOTIFICATIONS') }}
+              </mat-option>
+              <mat-option [value]="'packages'">
+                {{ t('PACKAGES') }}
+              </mat-option>
+              <mat-option [value]="'user_packages'">
+                {{ t('USER_PACKAGES') }}
+              </mat-option>
+              <mat-option [value]="'posts'">
+                {{ t('POSTS') }}
+              </mat-option>
+              <mat-option [value]="'pages'">
+                {{ t('PAGES') }}
+              </mat-option>
+              <mat-option [value]="'config'">
+                {{ t('CONFIG') }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="flex items-center mt-4 justify-between w-full border-t py-4">
+          <div *ngIf="mode === ViewMode.UPDATE">
+            <button type="button" class="-ml-4" mat-button [color]="'warn'" [disabled]="isSavingOrDeleting"
+              (click)="onDeleteButtonClicked()">
+              {{ t('DELETE') }}
+            </button>
+          </div>
+          <div class="flex items-center">
+            <button type="submit" mat-flat-button [color]="'primary'" [disabled]="isSavingOrDeleting"
+              (click)="onSaveButtonClicked()">
+              {{ t('SAVE') }}
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="px-4" *ngIf="alert.message">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="alert.type" [@fadeIn]="true"
+        [dismissible]="false">
+        {{ alert.message }}
+      </fuse-alert>
+    </div>
+
+  </div>
+</ng-container>

@@ -1,0 +1,218 @@
+<ng-container *transloco="let t">
+  <div class="flex flex-col w-full min-w-0 sm:absolute sm:inset-0 sm:overflow-hidden">
+
+    <!-- Loader -->
+    <div class="absolute inset-x-0 bottom-0 z-20" *ngIf="state === ViewState.LOADING">
+      <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+    </div>
+
+    <div class="flex-auto px-6 md:px-12 pt-9 pb-20 overflow-auto">
+
+      <form [formGroup]="form" [ngClass]="{'opacity-50 pointer-events-none': state === ViewState.LOADING}">
+
+        <div class="text-3xl font-extrabold mb-4">{{ t('CONFIG') }}</div>
+
+        <div class="mt-8">
+
+          <div class="my-4">
+            <p class="font-medium text-xl">{{ t('SLIDE_INTRO_SETTINGS') }}</p>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'isSlidesIntroDisabled'">
+              {{ t('DISABLE') }}
+            </mat-checkbox>
+          </div>
+
+          <div class="my-4">
+            <p class="font-medium text-xl">{{ t('PLACE_SETTINGS') }}</p>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-full md:w-1/3">
+              <mat-label>{{ t('SEARCH_RADIUS') }}</mat-label>
+              <span matSuffix>{{ t('METERS') | lowercase }}</span>
+              <input type="number" [formControlName]="'searchRadius'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'enablePaidListings'">
+              {{ t('ENABLE_PACKAGES') }}
+            </mat-checkbox>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'enablePromotedListings'">
+              {{ t('ENABLE_PROMOTED_LISTINGS') }}
+            </mat-checkbox>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'enableAutoApproveListings'">
+              {{ t('AUTO_APPROVE_ENABLED') }}
+            </mat-checkbox>
+          </div>
+
+          <div class="my-8 border-t"></div>
+
+          <div class="my-4">
+            <p class="font-medium text-xl">{{ t('STRIPE_SETTINGS') }}</p>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-1/3">
+              <mat-label>{{ t('STRIPE_PUBLIC_KEY') }}</mat-label>
+              <input [formControlName]="'stripePublicKey'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div class="my-8 border-t"></div>
+
+          <div class="my-4">
+            <p class="font-medium text-xl">{{ t('REVIEW_SETTINGS') }}</p>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'isReviewDisabled'">
+              {{ t('DISABLE') }}
+            </mat-checkbox>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'isReviewAutoApproveEnabled'">
+              {{ t('AUTO_APPROVE_ENABLED') }}
+            </mat-checkbox>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'isReviewMultiplePerUserEnabled'">
+              {{ t('REVIEW_MULTIPLE_ENABLED') }}
+            </mat-checkbox>
+          </div>
+
+          <div class="my-8 border-t"></div>
+
+          <div class="my-4">
+            <p class="font-medium text-xl">{{ t('AUTH_SETTINGS') }}</p>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'isFacebookLoginEnabled'">
+              Facebook
+            </mat-checkbox>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'isGoogleLoginEnabled'">
+              Google
+            </mat-checkbox>
+          </div>
+
+          <div>
+            <mat-checkbox [color]="'primary'" [formControlName]="'isAppleLoginEnabled'">
+              Apple Login (iOS)
+            </mat-checkbox>
+          </div>
+
+          <div class="my-8 border-t"></div>
+
+          <div class="my-4">
+            <p class="font-medium text-xl">{{ t('EMAIL_SETTINGS') }}</p>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-1/2">
+              <mat-label>{{ t('NOTIFICATION_EMAIL_ADDRESS') }}</mat-label>
+              <input type="email" [formControlName]="'notificationEmail'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div class="my-8 border-t"></div>
+
+          <div class="my-4">
+            <p class="font-medium text-xl">{{ t('ABOUT') }}</p>
+          </div>
+
+          <quill-editor class="my-4" [formControlName]="'description'" [placeholder]="''" [modules]="quillModules">
+          </quill-editor>
+
+          <div class="my-4">
+            <p class="font-medium text-xl">{{ t('TERMS_CONDITIONS') }}</p>
+          </div>
+
+          <quill-editor class="my-4" [formControlName]="'terms'" [placeholder]="''" [modules]="quillModules">
+          </quill-editor>
+
+          <div class="mt-4">
+            <mat-form-field class="w-full md:w-1/3">
+              <mat-label>Google Play URL</mat-label>
+              <input type="url" [formControlName]="'googlePlayUrl'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-1/3">
+              <mat-label>App Store URL</mat-label>
+              <input type="url" [formControlName]="'appStoreUrl'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-1/3">
+              <mat-label>{{ t('CONTACT_EMAIL') }}</mat-label>
+              <input type="email" [formControlName]="'contactEmail'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-1/3">
+              <mat-label>{{ t('CONTACT_PHONE') }}</mat-label>
+              <input type="tel" [formControlName]="'contactPhone'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-1/3">
+              <mat-label>Facebook</mat-label>
+              <input type="url" [formControlName]="'facebook'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-1/3">
+              <mat-label>Instagram</mat-label>
+              <input type="url" [formControlName]="'instagram'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full md:w-1/3">
+              <mat-label>YouTube</mat-label>
+              <input type="url" [formControlName]="'youtube'" matInput>
+            </mat-form-field>
+          </div>
+
+          <div class="mt-11 mb-10 border-t"></div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-end">
+            <button type="submit" class="ml-4" mat-flat-button [color]="'primary'" (click)="onSaveButtonClicked()">
+              {{ t('SAVE') }}
+            </button>
+          </div>
+
+        </div>
+      </form>
+
+      <div class="my-4" *ngIf="alert.message">
+        <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="alert.type" [@fadeIn]="true"
+          [dismissible]="false">
+          {{ alert.message }}
+        </fuse-alert>
+      </div>
+
+    </div>
+
+  </div>
+</ng-container>

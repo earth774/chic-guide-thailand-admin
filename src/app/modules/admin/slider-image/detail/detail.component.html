@@ -1,0 +1,250 @@
+<ng-container *transloco="let t">
+  <div class="flex flex-col flex-auto">
+
+    <div [hidden]="state !== ViewState.LOADING">
+      <mat-progress-bar mode="query"></mat-progress-bar>
+    </div>
+
+    <div class="my-2 mx-4" [hidden]="state !== ViewState.EMPTY">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="'warning'" [@fadeIn]="true" [dismissible]="false">
+        {{ t('NO_DATA_FOUND') }}
+      </fuse-alert>
+    </div>
+
+    <div class="my-2 mx-4" [hidden]="state !== ViewState.ERROR">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="'error'" [@fadeIn]="true" [dismissible]="false">
+        {{ t('ERROR_NETWORK') }}
+      </fuse-alert>
+    </div>
+
+    <div [hidden]="state !== ViewState.CONTENT">
+      <form [ngClass]="{'opacity-50 pointer-events-none': isSavingOrDeleting}"
+        class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto" [formGroup]="form">
+
+        <div class="flex items-center justify-between -mt-3 -ml-4">
+
+          <div class="flex items-center">
+            <button type="button" mat-icon-button [routerLink]="['../']">
+              <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+            </button>
+          </div>
+
+        </div>
+
+        <mat-divider class="mt-6 mb-8"></mat-divider>
+
+        <div class="mb-8">
+          <div
+            class="relative flex items-center justify-center w-32 h-32 rounded-md overflow-hidden ring-4 ring-bg-card">
+
+            <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+            <div class="absolute inset-0 flex items-center justify-center z-20">
+              <div>
+                <input id="avatar-file-input" class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                  type="file" [multiple]="false" [accept]="'image/jpeg, image/png'"
+                  (change)="onUploadFeaturedImage(imageFileInput.files)" #imageFileInput>
+                <label class="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer hover:bg-hover"
+                  for="avatar-file-input" matRipple>
+                  <mat-icon class="text-white" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
+                </label>
+              </div>
+              <div>
+                <button type="button" *ngIf="form?.get('image').value" mat-icon-button
+                  (click)="onRemoveFeaturedImage()">
+                  <mat-icon class="text-white" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                </button>
+              </div>
+            </div>
+            <img class="object-cover w-full h-full" *ngIf="form?.get('image').value"
+              [src]="form?.get('image').value._url">
+          </div>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('DESCRIPTION') }}</mat-label>
+            <input matInput [formControlName]="'description'" [spellcheck]="false" #descriptionField />
+            <mat-error *ngIf="form?.get('description').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('ORDER') }}</mat-label>
+            <input type="number" matInput [formControlName]="'sort'" [spellcheck]="false" />
+            <mat-error *ngIf="form?.get('sort').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-1/3">
+            <mat-label>{{ t('POSITION') }}</mat-label>
+            <mat-select [formControlName]="'position'">
+              <mat-option [value]="'top'">
+                {{t('TOP')}}
+              </mat-option>
+              <mat-option [value]="'bottom'">
+                {{t('BOTTOM')}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form?.get('position').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-1/3">
+            <mat-label>{{ t('PAGE') }}</mat-label>
+            <mat-select [formControlName]="'page'">
+              <mat-option [value]="'home'">
+                {{t('HOME')}}
+              </mat-option>
+              <mat-option [value]="'categories'">
+                {{t('CATEGORIES')}}
+              </mat-option>
+              <mat-option [value]="'places'">
+                {{t('PLACES')}}
+              </mat-option>
+              <mat-option [value]="'posts'">
+                {{t('POSTS')}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form?.get('page').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field class="w-1/3">
+            <mat-label>{{ t('TYPE') }}</mat-label>
+            <mat-select [formControlName]="'type'">
+              <mat-option [value]="'none'">
+                {{t('NO_LINK')}}
+              </mat-option>
+              <mat-option [value]="'place'">
+                {{t('PLACE')}}
+              </mat-option>
+              <mat-option [value]="'post'">
+                {{t('POST')}}
+              </mat-option>
+              <mat-option [value]="'category'">
+                {{t('CATEGORY')}}
+              </mat-option>
+              <mat-option [value]="'url'">
+                {{t('LINK')}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form?.get('type').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="form?.get('type').value === 'url'">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('LINK') }}</mat-label>
+            <input type="url" matInput [formControlName]="'url'" [spellcheck]="false" />
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="form?.get('type').value === 'category'">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('CATEGORY') }}</mat-label>
+            <input class="w-full h-full" matInput (input)="onSearchCategory($event)" [formControlName]="'category'"
+              [matAutocomplete]="categoryAutocomplete" [placeholder]="t('SEARCH')">
+            <mat-autocomplete class="max-h-128 sm:px-2 border-t rounded-b shadow-md" [disableRipple]="true"
+              #categoryAutocomplete="matAutocomplete" [displayWith]="displayCategoryWith"
+              (optionSelected)="onCategorySelected($event)">
+              <ng-container *ngFor="let category of categories; trackBy: trackByFn">
+                <mat-option [value]="category"
+                  class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover">
+                  {{ category.title }}
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
+            <mat-error *ngIf="form?.get('category').hasError('mustMatch')">
+              {{ t('FIELD_MATCH_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="form?.get('type').value === 'post'">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('POST') }}</mat-label>
+            <input class="w-full h-full" matInput (input)="onSearchPost($event)" [formControlName]="'post'"
+              [matAutocomplete]="postAutocomplete" [placeholder]="t('SEARCH')">
+            <mat-autocomplete class="max-h-128 sm:px-2 border-t rounded-b shadow-md" [disableRipple]="true"
+              #postAutocomplete="matAutocomplete" [displayWith]="displayPostWith"
+              (optionSelected)="onPostSelected($event)">
+              <ng-container *ngFor="let post of posts; trackBy: trackByFn">
+                <mat-option [value]="post"
+                  class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover">
+                  {{ post.title }}
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
+            <mat-error *ngIf="form?.get('post').hasError('mustMatch')">
+              {{ t('FIELD_MATCH_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="form?.get('type').value === 'place'">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('PLACE') }}</mat-label>
+            <input class="w-full h-full" matInput (input)="onSearchPlace($event)" [formControlName]="'place'"
+              [matAutocomplete]="placeAutocomplete" [placeholder]="t('SEARCH')">
+            <mat-autocomplete class="max-h-128 sm:px-2 border-t rounded-b shadow-md" [disableRipple]="true"
+              #placeAutocomplete="matAutocomplete" [displayWith]="displayPlaceWith"
+              (optionSelected)="onPlaceSelected($event)">
+              <ng-container *ngFor="let place of places; trackBy: trackByFn">
+                <mat-option [value]="place"
+                  class="group relative mb-1 py-0 px-6 text-md rounded-md hover:bg-gray-100 dark:hover:bg-hover">
+                  {{ place.title }}
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
+            <mat-error *ngIf="form?.get('place').hasError('mustMatch')">
+              {{ t('FIELD_MATCH_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-checkbox [color]="'primary'" [formControlName]="'isActive'">
+            {{ t('ACTIVE') }}
+          </mat-checkbox>
+        </div>
+
+        <div class="flex items-center mt-4 justify-between w-full border-t py-4">
+          <div *ngIf="mode === ViewMode.UPDATE">
+            <button type="button" class="-ml-4" mat-button [color]="'warn'" [disabled]="isSavingOrDeleting"
+              (click)="onDeleteButtonClicked()">
+              {{ t('DELETE') }}
+            </button>
+          </div>
+          <div class="flex items-center">
+            <button type="submit" mat-flat-button [color]="'primary'" [disabled]="isSavingOrDeleting"
+              (click)="onSaveButtonClicked()">
+              {{ t('SAVE') }}
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="px-4" *ngIf="alert.message">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="alert.type" [@fadeIn]="true" [dismissible]="false">
+        {{ alert.message }}
+      </fuse-alert>
+    </div>
+
+  </div>
+</ng-container>

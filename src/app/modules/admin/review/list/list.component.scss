@@ -1,0 +1,15 @@
+.data-grid {
+  grid-template-columns: 48px 48px auto 120px;
+
+  @screen sm {
+    grid-template-columns: 48px 48px auto 120px 120px;
+  }
+
+  @screen md {
+    grid-template-columns: 48px 48px auto 120px 120px 112px;
+  }
+
+  @screen lg {
+    grid-template-columns: 48px 48px auto 120px 120px 112px 112px;
+  }
+}

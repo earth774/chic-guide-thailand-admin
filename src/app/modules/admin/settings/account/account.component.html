@@ -1,0 +1,87 @@
+<ng-container *transloco="let t">
+  <div class="w-full max-w-3xl">
+
+    <form [formGroup]="form" [ngClass]="{'opacity-50 pointer-events-none': state === ViewState.LOADING}">
+
+      <div class="w-full">
+        <div class="text-xl">{{ t('PROFILE') }}</div>
+      </div>
+
+      <div class="my-8">
+        <div class="relative flex items-center justify-center w-32 h-32 rounded-md overflow-hidden ring-4 ring-bg-card">
+
+          <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+          <div class="absolute inset-0 flex items-center justify-center z-20">
+            <div>
+              <input id="avatar-file-input" class="absolute h-0 w-0 opacity-0 invisible pointer-events-none" type="file"
+                [multiple]="false" [accept]="'image/jpeg, image/png'" (change)="onUploadImage(imageFileInput.files)"
+                #imageFileInput>
+              <label class="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer hover:bg-hover"
+                for="avatar-file-input" matRipple>
+                <mat-icon class="text-white" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
+              </label>
+            </div>
+            <div>
+              <button type="button" *ngIf="form?.get('photo').value" mat-icon-button (click)="onRemoveImage()">
+                <mat-icon class="text-white" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+              </button>
+            </div>
+          </div>
+          <img class="object-cover w-full h-full" *ngIf="form?.get('photo').value"
+            [src]="form?.get('photo').value._url">
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+        <!-- Name -->
+        <div class="sm:col-span-4">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('FULL_NAME') }}</mat-label>
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:user'" matPrefix></mat-icon>
+            <input [formControlName]="'name'" matInput>
+            <mat-error *ngIf="form?.get('name').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <!-- Username -->
+        <div class="sm:col-span-4">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('USERNAME') }}</mat-label>
+            <input [formControlName]="'username'" matInput>
+            <mat-error *ngIf="form?.get('username').hasError('required')">
+              {{ t('FIELD_REQUIRED') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <!-- Email -->
+        <div class="sm:col-span-4">
+          <mat-form-field class="w-full">
+            <mat-label>{{ t('EMAIL_ADDRESS') }}</mat-label>
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:mail'" matPrefix></mat-icon>
+            <input type="email" [formControlName]="'email'" matInput>
+            <mat-error *ngIf="form?.get('email').hasError('email')">
+              {{ t('EMAIL_ADDRESS_INVALID') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="mt-11 mb-10 border-t"></div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end">
+        <button type="submit" class="ml-4" mat-flat-button [color]="'primary'" (click)="onSaveButtonClicked()">
+          {{ t('SAVE') }}
+        </button>
+      </div>
+    </form>
+
+    <div class="my-4" *ngIf="alert.message">
+      <fuse-alert [appearance]="'outline'" [showIcon]="true" [type]="alert.type" [@fadeIn]="true" [dismissible]="false">
+        {{ alert.message }}
+      </fuse-alert>
+    </div>
+
+  </div>
+</ng-container>
