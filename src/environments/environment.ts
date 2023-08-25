@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  serverUrl: 'http://localhost:1337/api',
+  serverUrl: 'http://188.166.157.95/api',
   appId: 'myAppId',
   languages: [{
     id: 'en',
@@ -18,7 +18,7 @@ export const environment = {
     label: 'Spanish',
   }],
   showLanguageSelector: true,
-  googleMapsApiKey: 'YOUR_GOOGLE_MAPS_API_KEY',
+  googleMapsApiKey: 'AIzaSyDYsWCmb62mEqZQ9pNz_QoWPSZHY9GV_s8',
   pageSize: 25,
 };
 

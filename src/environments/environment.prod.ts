@@ -14,6 +14,6 @@ export const environment = {
     label: 'Spanish',
   }],
   showLanguageSelector: true,
-  googleMapsApiKey: 'YOUR_GOOGLE_MAPS_API_KEY',
+  googleMapsApiKey: 'AIzaSyDYsWCmb62mEqZQ9pNz_QoWPSZHY9GV_s8',
   pageSize: 25,
 };
