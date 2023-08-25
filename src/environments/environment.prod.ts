@@ -1,7 +1,7 @@
 export const environment = {
-  production: true,
+  production: false,
   serverUrl: 'https://nearmev5.quanlabs.com/api',
-  appId: 'YOUR_APP_ID',
+  appId: 'ChicGuidThailand',
   languages: [{
     id: 'en',
     locale: 'en-US',

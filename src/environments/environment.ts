@@ -3,9 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
-  serverUrl: 'http://188.166.157.95/api',
-  appId: 'myAppId',
+  production: true,
+  serverUrl: 'http://174.138.58.34/api',
+  appId: 'ChicGuidThailand',
   languages: [{
     id: 'en',
     locale: 'en-US',
