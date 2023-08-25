@@ -1,5 +1,5 @@
 {
-  "name": "@quanlabs/nearme-admin",
+  "name": "nearme-admin",
   "version": "8.0.0",
   "description": "",
   "author": "https://quanlabs.com",
@@ -8,7 +8,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod && mv dist/nearme-admin _static",
+    "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
