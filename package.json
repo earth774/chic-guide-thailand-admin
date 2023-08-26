@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 8080 --host 174.138.58.34",
     "build": "ng build --prod",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
