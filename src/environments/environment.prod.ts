@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   // serverUrl: 'https://nearmev5.quanlabs.com/api',
-  serverUrl: 'https://chic-guide-thailand-api-a2qdj.ondigitalocean.app/api',
+  serverUrl: 'https://chic-guide-api-46ue3.ondigitalocean.app/api',
   appId: 'ChicGuidThailand',
   languages: [{
     id: 'en',
