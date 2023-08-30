@@ -3,8 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: true,
-  serverUrl: 'http://174.138.58.34/api',
+  production: false,
+  serverUrl: 'http://157.230.244.244:1337/api',
   appId: 'ChicGuidThailand',
   languages: [{
     id: 'en',
