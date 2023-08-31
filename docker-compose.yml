@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web_admin:
+    container_name: 'sampran_upstream_webadmin_client'
+    build:
+      context: .
+    image: sampran_upstream_webadmin_client
+    restart: always
+    ports:
+      - 2001:80
+    working_dir: /var/www/app
