@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  serverUrl: 'https://api.chicguidethailand.com',
+  serverUrl: 'https://api.chicguidethailand.com/api',
   appId: 'ChicGuidThailand',
   languages: [{
     id: 'en',
