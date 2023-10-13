@@ -1,4 +1,4 @@
-# Nearme - Ionic / Capacitor Template + Node.js Backend
+# Chic Guide Thailand - Ionic / Capacitor Template + Node.js Backend
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli)
 
